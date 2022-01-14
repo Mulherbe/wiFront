@@ -5,38 +5,61 @@ import { useState } from "react";
 
 export default function Posts(props) {
 
-    const [tamere, setTamere] = useState([]);
+    const [Articlo, setArticlo] = useState([]);
+    const [currentPage, setCurrentPage] = useState('');
+    const [lastPage, setLastPage] = useState('');
+
+    const [nextPage, setNextPage] = useState('');
+    const [previousPage, setPreviousPage] = useState('');
+
+
+    const lulzFunc = async (fetchUrl) => {
+        try {
+            const res = await fetch(fetchUrl).then(res => res.json());
+            setCurrentPage(res.current_page);
+            setLastPage(res.last_page);
+            setNextPage(res.next_page_url);
+            setPreviousPage(res.prev_page_url);
+            setArticlo(res.data.map((value, key) => {
+                return (
+                    <Post
+                        title={value.title}
+                        text_body={value.text_body}
+                        description={value.description}
+                        fkid={value.id}
+                        key={key}
+                    />
+                )
+            }));
+        } catch(error) {
+            return error;
+        }
+    }
 
     useEffect(() => {
-        const lulzFunc = async () => {
-            try {
-                const res = await fetch('https://fred-dev.fr/api/article', {
-                    method: "GET",
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                })
-                .then(res => res.json()); 
-                setTamere(res.map((value, key) => {
-                    return (
-                        <Post
-                            title={value.title}
-                            text_body={value.text_body}
-                            description={value.description}
-                            fkid={value.id}
-                        />
-                    )
-                }));
-            } catch(error) {
-                return error;
-            }
-        };
-        lulzFunc();
+        lulzFunc('http://localhost/wi/wicode-api/public/api/article?page=1');
     }, []);
 
     return (
-        <div className="posts">
-            {tamere}
-        </div>
+        <>
+
+            <div className="posts">
+                {Articlo}
+            </div>
+            <div>{`${currentPage} / ${lastPage}`}</div>
+            <button 
+                className="prevnext"
+                onClick={() => {lulzFunc(previousPage);}}
+            >
+                previous
+            </button>
+
+            <button 
+                className="prevnext"
+                onClick={() => {lulzFunc(nextPage);}}
+            >
+                next
+            </button>
+        </>
     )
 }

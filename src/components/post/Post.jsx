@@ -16,7 +16,7 @@ export default function Post(props) {
                </div>
                <span className="postTitle">
                 <strong><b>{props.fkid}</b></strong>
-                -{props.title}
+                - <a href={'post/'+props.fkid }>{props.title}</a>
                </span>
                 <span><i><small>{props.description}</small></i></span>
                <hr/>
